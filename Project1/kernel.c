@@ -69,8 +69,7 @@ void printString(char* c)
 
 void readString(char* c)
 {
-	int ending = 0;
-	char* c = 0; 
+	int ending = 0; 
 	int i = 0;
 	char n;
 	while(ending == 0) {
@@ -81,7 +80,7 @@ void readString(char* c)
 		}
 		else if(n == 0xD) { /*Enter Handler*/
 			ending = 1;
-			*(c+i) = '\0';
+			*(c+i) = 0x0;
 			i++;
 			printString(c);
 		}
