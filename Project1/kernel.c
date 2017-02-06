@@ -53,13 +53,14 @@ void main()
    interrupt(33,0,"Your number is \0",0,0);
    interrupt(33,13,x,0,0);
    interrupt(33,0,"\r\n\0",0,0);
+	
    while(1);
 }
 
 void printString(char* c)
 {
 	int i = 0;
-   while(c != '\0') {
+   while(*(c+i) != '\0') {
 		interrupt(16,14*256+*(c+i),0,0,0);
 		i++;
    }
