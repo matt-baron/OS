@@ -29,7 +29,7 @@ void handleInterrupt21(int, int, int, int);
 void main()
 {
    char line[80];
-	int x;
+	int* x;
   
    makeInterrupt21();
    /*clearScreen(0,0);*/
@@ -46,12 +46,12 @@ void main()
    interrupt(33,0,"Hola mondo.\r\n\0",0,0);
    interrupt(33,0,"Enter a line: \0",0,0);
    interrupt(33,1,line,0,0);
-   interrupt(33,0,"\r\nYou typed: \0",0,0);
+   interrupt(33,0,"\r\nYou typed: \r\n\0",0,0);
    interrupt(33,0,line,0,0);
    interrupt(33,0,"\r\n\0",0,0);
-   interrupt(33,0,"Enter a number: \0",0,0);
+   interrupt(33,0,"\r\nEnter a number:\0",0,0);
 	interrupt(33,14,x,0,0);
-	interrupt(33,0,"Your number was: \0",0,0);
+	interrupt(33,0,"\r\nYour number was:\0",0,0);
    interrupt(33,13,x,0,0);
    interrupt(33,0,"\r\n\0",0,0);
 	
@@ -70,7 +70,7 @@ void printString(char* c)
 
 void readString(char* c)
 {
-	int ending = 0; 
+ 	int ending = 0; 
 	int i = 0;
 	char n;
 	while(ending == 0) {
@@ -142,18 +142,23 @@ void writeInt(int x)
    printString(d);
 }
 
-void readInt(int* number)
+void readInt(int* num)
 {
-	char* c;
-   int i = 0;
+   char* c;
+	int i = 0;
 	int len = 0;
+	int pwr;
 	readString(c);
-	while(*(c+len++) != '\0');
+	while(*(c+len++) != '\0'); /*Find length of c arr*/
 	len--;
-	while(len > -1) {
-		number += *(c+i++)^len--;
+	while(len > 0) {
+		for(pwr = 1; pwr<len;pwr++){ /*Use length to calculate base 10 power for each int in the array*/
+			pwr *= 10;
+		}
+	num += (*(c+i++) - '0') * pwr; /*Convert char to int then multiply by calculated base 10*/
+	len--;
 	}
-
+	
    return;
 }
 
