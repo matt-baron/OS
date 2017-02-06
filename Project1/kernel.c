@@ -29,8 +29,8 @@ void handleInterrupt21(int, int, int, int);
 void main()
 {
    char line[80];
-   int x;
-   
+	int x;
+  
    makeInterrupt21();
    /*clearScreen(0,0);*/
 	interrupt(33,12,1,5,0);
@@ -49,8 +49,9 @@ void main()
    interrupt(33,0,"\r\nYou typed: \0",0,0);
    interrupt(33,0,line,0,0);
    interrupt(33,0,"\r\n\0",0,0);
-   x = 5; 
-   interrupt(33,0,"Your number is \0",0,0);
+   interrupt(33,0,"Enter a number: \0",0,0);
+	interrupt(33,14,x,0,0);
+	interrupt(33,0,"Your number was: \0",0,0);
    interrupt(33,13,x,0,0);
    interrupt(33,0,"\r\n\0",0,0);
 	
