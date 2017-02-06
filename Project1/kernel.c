@@ -19,52 +19,49 @@
 /*                                                                        */
 /*                                                                        */
 /*                                                                        */
-/* Signed:________Jacob Hamblen____________ Date:___1/30/17_______        */
+/* Signed:__Jacob Hamblen & Matt Baron_____ Date:___1/30/17_______        */
 /*                                                                        */
 /*                                                                        */
 /* 3460:4/526 BlackDOS kernel, Version 1.03, Spring 2017.                 */
 
-void printString(char*);
-void readString(char*);
-void writeInt(int);
-void readInt(int*);
-void clearScreen(int, int);
+void handleInterrupt21(int, int, int, int);
 
 void main()
 {
    char line[80];
    int x;
    
-   /*makeInterrupt21();*/
-   clearScreen(0,0);
-
-   printString("___.   .__                 __       .___           \r\n\0");
-   printString("\\_ |__ |  | _____    ____ |  | __ __| _/___  ______\r\n\0");
-   printString(" | __ \\|  | \\__  \\ _/ ___\\|  |/ // __ |/ _ \\/  ___/\r\n\0");
-   printString(" | \\_\\ \\  |__/ /\\ \\\\  \\___|    </ /_/ ( <_> )___ \\ \r\n\0");
-   printString(" |___  /____(____  /\\___  >__|_ \\____ |\\___/____  >\r\n\0");
-   printString("     \\/          \\/     \\/     \\/    \\/         \\/ \r\n\0");
-   printString(" V. 1.03, C. 2017. Based on a project by M. Black. \r\n\0");
-   printString(" Author(s): your name(s) here.\r\n\r\n\0");
+   makeInterrupt21();
+   /*clearScreen(0,0);*/
+	interrupt(33,12,1,5,0);
+   interrupt(33,0,"___.   .__                 __       .___           \r\n\0",0,0);
+   interrupt(33,0,"\\_ |__ |  | _____    ____ |  | __ __| _/___  ______\r\n\0",0,0);
+   interrupt(33,0," | __ \\|  | \\__  \\ _/ ___\\|  |/ // __ |/ _ \\/  ___/\r\n\0",0,0);
+   interrupt(33,0," | \\_\\ \\  |__/ /\\ \\\\  \\___|    </ /_/ ( <_> )___ \\ \r\n\0",0,0);
+   interrupt(33,0," |___  /____(____  /\\___  >__|_ \\____ |\\___/____  >\r\n\0",0,0);
+   interrupt(33,0,"     \\/          \\/     \\/     \\/    \\/         \\/ \r\n\0",0,0);
+   interrupt(33,0," V. 1.03, C. 2017. Based on a project by M. Black. \r\n\0",0,0);
+   interrupt(33,0," Author(s): Jake Hamblen and Matt Baron.\r\n\r\n\0",0,0);
    
-   printString("Hola mondo.\r\n\0");
-   printString("Enter a line: \0");
-   readString(line);
-   printString("\r\nYou typed: \0");
-   printString(line);
-   printString("\r\n\0");
-   /* x = 5; */
-   /* printString("Your number is \0"); */
-   /* writeInt(x); */
-   /* printString("\r\n\0"); */
+   interrupt(33,0,"Hola mondo.\r\n\0",0,0);
+   interrupt(33,0,"Enter a line: \0",0,0);
+   interrupt(33,1,line,0,0);
+   interrupt(33,0,"\r\nYou typed: \0",0,0);
+   interrupt(33,0,line,0,0);
+   interrupt(33,0,"\r\n\0",0,0);
+   x = 5; 
+   interrupt(33,0,"Your number is \0",0,0);
+   interrupt(33,13,x,0,0);
+   interrupt(33,0,"\r\n\0",0,0);
    while(1);
 }
 
 void printString(char* c)
 {
+	int i = 0;
    while(c != '\0') {
-		interrupt(16,14*256+*c,0,0,0);
-		c++;
+		interrupt(16,14*256+*(c+i),0,0,0);
+		i++;
    }
 	return;
 }
@@ -78,16 +75,18 @@ void readString(char* c)
 	while(ending == 0) {
    	n = interrupt(22,0,0,0,0);
    	if(n == 0x8 && i != 0) {  /*Backspace Handler*/
-			c[i] = ' ';
+			*(c+i) = ' ';
 			i--;
 		}
 		else if(n == 0xD) { /*Enter Handler*/
 			ending = 1;
-			c[i++] = '\0';
+			*(c+i) = '\0';
+			i++;
 			printString(c);
 		}
 		else {	/*otherwise, write n to string array.*/
-			c[i++] = n;	
+			*(c+i) = n;
+			i++;
 		}
 	}
 	return;
@@ -148,15 +147,27 @@ void readInt(int* number)
    int i = 0;
 	int len = 0;
 	readString(c);
-	while(c[len++] != '\0');
+	while(*(c+len++) != '\0');
 	len--;
 	while(len > -1) {
-		number += c[i++]^len--;
+		number += *(c+i++)^len--;
 	}
 
    return;
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx) {
-
+	if(ax == 0)
+		printString(bx);
+	else if(ax == 1) 
+		readString(bx);
+	else if(ax == 12)
+		clearScreen(bx, cx);
+	else if(ax == 13) 
+		writeInt(bx);
+	else if(ax == 14)
+		readInt(bx);
+	else {
+		printString("Error: Invalid interrupt command");
+	}
 }
