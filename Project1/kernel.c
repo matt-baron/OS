@@ -52,7 +52,7 @@ void main()
    interrupt(33,0,"\r\nEnter a number:\0",0,0);
 	interrupt(33,14,x,0,0);
 	interrupt(33,0,"\r\nYour number was:\0",0,0);
-   interrupt(33,13,x,0,0);
+   interrupt(33,13,*x,0,0);
    interrupt(33,0,"\r\n\0",0,0);
 	
    while(1);
@@ -144,21 +144,26 @@ void writeInt(int x)
 
 void readInt(int* num)
 {
-   char* c;
-	int i = 0;
-	int len = 0;
-	int pwr;
+	char* c;
+	int offset = 0;
+	int n = 1;
+	int i=0;
+	int sign = 1;
 	readString(c);
-	while(*(c+len++) != '\0'); /*Find length of c arr*/
-	len--;
-	while(len > 0) {
-		for(pwr = 1; pwr<len;pwr++){ /*Use length to calculate base 10 power for each int in the array*/
-			pwr *= 10;
-		}
-	num += (*(c+i++) - '0') * pwr; /*Convert char to int then multiply by calculated base 10*/
-	len--;
+	if(c[0] = '-') {
+		sign = -1;
+		offset = 1;
 	}
-	
+	for(i = offset; c[i] != '\0'; i++);
+	i--;
+
+	*num = 0;
+	while(i >= offset) {
+		*num += (c[i] - '\0') * n;
+		n *= 10;
+		i--;
+	}
+	*num *= sign;
    return;
 }
 
