@@ -24,7 +24,7 @@
 /*                                                                        */
 /* 3460:4/526 BlackDOS kernel, Version 1.03, Spring 2017.                 */
 
-void handleInterrupt21(int, int, int, int);
+void handleInterrupt21(int, int, int, int*);
 
 void main()
 {
@@ -50,9 +50,9 @@ void main()
    interrupt(33,0,line,0,0);
    interrupt(33,0,"\r\n\0",0,0);
    interrupt(33,0,"\r\nEnter a number:\0",0,0);
-	interrupt(33,14,x,0,0);
+	interrupt(33,14,&x,0,0);
 	interrupt(33,0,"\r\nYour number was:\0",0,0);
-   interrupt(33,13,*x,0,0);
+   interrupt(33,13,x,0,0);
    interrupt(33,0,"\r\n\0",0,0);
 	
    while(1);
@@ -148,22 +148,16 @@ void readInt(int* num)
 	int offset = 0;
 	int n = 1;
 	int i=0;
-	int sign = 1;
 	readString(c);
-	if(c[0] = '-') {
-		sign = -1;
-		offset = 1;
-	}
-	for(i = offset; c[i] != '\0'; i++);
-	i--;
+	for(i = offset; c[i] != '\0' && i < 6; i++);
 
 	*num = 0;
+	i--;
 	while(i >= offset) {
-		*num += (c[i] - '\0') * n;
+		*num = *num + (c[i] - '0') * n;
 		n *= 10;
 		i--;
 	}
-	*num *= sign;
    return;
 }
 
